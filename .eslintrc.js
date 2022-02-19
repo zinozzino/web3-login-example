@@ -6,7 +6,12 @@ const config = {
     browser: true,
     es2021: true,
   },
-  extends: ['eslint:recommended', 'airbnb-base', 'plugin:prettier/recommended'],
+  extends: [
+    'plugin:@next/next/recommended',
+    'eslint:recommended',
+    'airbnb-base',
+    'plugin:prettier/recommended',
+  ],
   plugins: ['import'],
   overrides: [
     {
