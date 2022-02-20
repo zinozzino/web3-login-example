@@ -37,7 +37,10 @@ const config = {
         'comma-dangle': 'off',
         'no-sparse-arrays': 'off',
         'no-undef': 'off',
+        'operator-linebreak': 'off',
         'arrow-parens': 'off',
+        'implicit-arrow-linebreak': 'off',
+        'function-paren-newline': 'off',
         'import/extensions': [
           'error',
           'ignorePackages',
@@ -53,6 +56,7 @@ const config = {
         'jsx-a11y/anchor-is-valid': 'off',
         'jsx-a11y/label-has-associated-control': 'off',
         'react/button-has-type': 'off',
+        'react/forbid-prop-types': 'off',
         'react/jsx-filename-extension': [
           'error',
           { extensions: ['jsx', 'tsx'] },

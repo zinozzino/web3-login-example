@@ -1,9 +1,15 @@
 import clsx from 'clsx';
 import { FC } from 'react';
 
-const Main: FC = ({ children }) => (
-  <main className={clsx('flex-1', 'w-full max-w-[1280px]', 'px-8 pt-8')}>
-    {children}
+export interface MainProps {
+  className?: string;
+}
+
+const Main: FC<MainProps> = ({ className, children }) => (
+  <main className={clsx('flex-1', 'pt-8', 'flex flex-col items-center')}>
+    <article className={clsx('w-full max-w-[1280px]', 'px-8', className)}>
+      {children}
+    </article>
   </main>
 );
 

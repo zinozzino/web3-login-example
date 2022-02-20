@@ -34,8 +34,8 @@ export default NextAuth({
     colorScheme: 'light',
   },
   callbacks: {
-    async jwt(params) {
-      return { ...params, userRole: 'user' };
+    async session({ session, user }) {
+      return { ...session, user: { ...user, id: user.id } };
     },
   },
 });

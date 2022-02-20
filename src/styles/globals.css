@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply grid grid-flow-col gap-2 items-center;
+    @apply px-3 py-2;
+    @apply rounded-md;
+  }
+}

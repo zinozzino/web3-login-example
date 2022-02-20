@@ -45,6 +45,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Wallet        Wallet[]
 }
 
 model VerificationToken {
@@ -54,4 +55,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Wallet {
+  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  userId  String @db.ObjectId
+  address String @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
