@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint --fix \"pages/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\"",
-    "types": "tsc --noEmit"
+    "types": "tsc --noEmit",
+    "vercel-build": "prisma generate && prisma db push && next build"
   },
   "author": "Jinho Jeong <jjinho0203@gmail.com>",
   "dependencies": {
