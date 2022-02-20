@@ -34,6 +34,7 @@ const config = {
       ],
       plugins: ['react', 'react-hooks', 'jsx-a11y', '@typescript-eslint'],
       rules: {
+        'comma-dangle': 'off',
         'no-sparse-arrays': 'off',
         'no-undef': 'off',
         'arrow-parens': 'off',
@@ -49,7 +50,9 @@ const config = {
             alphabetize: { order: 'asc', caseInsensitive: true },
           },
         ],
-        'jsx-a11y/anchor-is-valid': ['off'],
+        'jsx-a11y/anchor-is-valid': 'off',
+        'jsx-a11y/label-has-associated-control': 'off',
+        'react/button-has-type': 'off',
         'react/jsx-filename-extension': [
           'error',
           { extensions: ['jsx', 'tsx'] },
