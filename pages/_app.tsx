@@ -1,14 +1,21 @@
+import { config } from '@fortawesome/fontawesome-svg-core';
 import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 
-import './styles.css';
+import '~/styles/globals.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 
-// Use of the <SessionProvider> is mandatory to allow components that call
-// `useSession()` anywhere in your application to access the `session` object.
-export default function App({ Component, pageProps }: AppProps) {
+config.autoAddCss = false;
+
+function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps): JSX.Element {
   return (
-    <SessionProvider session={pageProps.session} refetchInterval={0}>
+    <SessionProvider session={session}>
       <Component {...pageProps} />
     </SessionProvider>
   );
 }
+
+export default App;

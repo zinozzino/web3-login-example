@@ -7,12 +7,12 @@ const config = {
     es2021: true,
   },
   extends: [
-    'plugin:@next/next/recommended',
     'eslint:recommended',
     'airbnb-base',
+    'plugin:@next/next/recommended',
     'plugin:prettier/recommended',
   ],
-  plugins: ['import'],
+  plugins: ['import', 'prettier'],
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
@@ -34,6 +34,8 @@ const config = {
       ],
       plugins: ['react', 'react-hooks', 'jsx-a11y', '@typescript-eslint'],
       rules: {
+        'no-sparse-arrays': 'off',
+        'no-undef': 'off',
         'arrow-parens': 'off',
         'import/extensions': [
           'error',
@@ -47,6 +49,7 @@ const config = {
             alphabetize: { order: 'asc', caseInsensitive: true },
           },
         ],
+        'jsx-a11y/anchor-is-valid': ['off'],
         'react/jsx-filename-extension': [
           'error',
           { extensions: ['jsx', 'tsx'] },
