@@ -6,6 +6,8 @@ import { FC } from 'react';
 const Header: FC = () => {
   const { data: session } = useSession();
 
+  const username = session?.user?.name ?? session?.user?.email ?? '';
+
   return (
     <header
       className={clsx([
@@ -27,8 +29,12 @@ const Header: FC = () => {
         <div className="grid grid-flow-col gap-4">
           {session ? (
             <>
-              <Link href="/profile">{session.user?.name}</Link>
-              <Link href="/api/auth/signout">Log out</Link>
+              <Link href="/profile">
+                <a>{username}</a>
+              </Link>
+              <Link href="/api/auth/signout">
+                <a>Log out</a>
+              </Link>
             </>
           ) : (
             <Link href="/api/auth/signin">Log in</Link>
