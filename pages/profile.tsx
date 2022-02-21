@@ -142,6 +142,7 @@ const Page: FC<PageProps> = ({ accounts, providers }) => {
             <thead>
               <tr className="border-b-[1px] border-gray-200">
                 <th className="py-2">Wallet ID</th>
+                <th className="py-2">Linked</th>
                 <th className="py-2">Actions</th>
               </tr>
             </thead>
@@ -156,6 +157,9 @@ const Page: FC<PageProps> = ({ accounts, providers }) => {
                       <pre>
                         <code>{wallet.address}</code>
                       </pre>
+                    </td>
+                    <td className="py-2 text-center">
+                      <p className="text-green-500">Linked</p>
                     </td>
                     <td className="py-2 text-center">
                       <button

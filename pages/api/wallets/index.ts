@@ -1,4 +1,5 @@
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { Wallet } from '@prisma/client';
+import { nanoid } from 'nanoid';
 import { NextApiHandler } from 'next';
 import { getSession } from 'next-auth/react';
 import * as yup from 'yup';
@@ -35,26 +36,35 @@ const Api: NextApiHandler = async (req, res) => {
       try {
         const { addresses } = await schema.validate(req.body);
 
-        const wallets = await Promise.all(
+        const wallets = await Promise.allSettled(
           addresses.map(async address =>
             prisma.wallet.create({
               data: {
                 address,
                 userId,
+                nonce: nanoid(16),
               },
               select: { address: true, id: true },
             })
           )
         );
 
-        res.status(201).json({ wallets });
+        res.status(201).json({
+          wallets: wallets
+            .filter(
+              (
+                data
+              ): data is PromiseFulfilledResult<
+                Pick<Wallet, 'address' | 'id'>
+              > => data.status === 'fulfilled'
+            )
+            .map(({ value }) => value),
+        });
       } catch (err) {
         if (err instanceof yup.ValidationError) {
           const { name, errors } = err as yup.ValidationError;
 
           res.status(400).json({ name, errors });
-        } else if (err instanceof PrismaClientKnownRequestError) {
-          res.status(400).json({ message: 'wallet already exists.' });
         } else {
           res.status(500).json({ message: 'Internal Server Error' });
         }

@@ -22,6 +22,7 @@ const Api: NextApiHandler = async (req, res) => {
         const { id } = await querySchema.validate(req.query);
 
         const wallet = await prisma.wallet.findFirst({
+          select: { id: true },
           where: { AND: [{ userId }, { id }] },
         });
 
