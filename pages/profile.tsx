@@ -1,9 +1,10 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Wallet } from '@prisma/client';
+import { Account, Wallet } from '@prisma/client';
 import axios from 'axios';
 import clsx from 'clsx';
 import isNil from 'lodash/isNil';
+import { getProviders, signIn } from 'next-auth/react';
 import Head from 'next/head';
 import { FC } from 'react';
 import toast from 'react-hot-toast';
@@ -15,15 +16,20 @@ import Main from '~/components/main';
 import Toolbar from '~/components/toolbar';
 import { IS_METAMASK_ENABLED } from '~/config';
 import useProtected from '~/hooks/useProtected';
+import prisma from '~/prisma';
 import getServerSideSession from '~/utils/getServerSideSession';
 import isNonNullArray from '~/utils/isNonNullArray';
 
 const queryKey = '/api/wallets';
 
-const Page: FC = () => {
+interface PageProps {
+  accounts: Account[];
+  providers: Awaited<ReturnType<typeof getProviders>>;
+}
+
+const Page: FC<PageProps> = ({ accounts, providers }) => {
   const queryClient = useQueryClient();
   const isLoggedIn = useProtected({ redirect: '/api/auth/signin' });
-
   const { data } = useQuery(
     queryKey,
     async () => (await axios.get<{ wallets: Wallet[] }>(queryKey)).data.wallets
@@ -89,6 +95,35 @@ const Page: FC = () => {
       </Head>
       <Header />
       <Main>
+        <Toolbar title="Link Accounts" />
+        <div className="p-4 grid grid-flow-row gap-4">
+          {providers &&
+            Object.entries(providers)
+              .filter(([provider]) => provider !== 'email')
+              .map(([provider]) => {
+                const account = accounts.find(acc => acc.provider === provider);
+
+                return (
+                  <div
+                    key={provider}
+                    className={clsx('flex flex-row justify-between')}
+                  >
+                    <p>{provider}</p>
+                    {account ? (
+                      <p className={clsx('text-green-500')}>Linked</p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => signIn(provider)}
+                        className={clsx('btn', 'bg-green-400')}
+                      >
+                        Link
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+        </div>
         <Toolbar title="My Wallets">
           <button
             type="button"
@@ -145,6 +180,21 @@ const Page: FC = () => {
   );
 };
 
-export const getServerSideProps = getServerSideSession();
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+export const getServerSideProps = getServerSideSession<PageProps>(async ctx => {
+  const { id: userId } = ctx.session?.user ?? {};
+
+  const accounts = await prisma.account.findMany({ where: { userId } });
+
+  const providers = await getProviders();
+
+  return {
+    props: {
+      accounts,
+      providers,
+    },
+  };
+});
 
 export default Page;

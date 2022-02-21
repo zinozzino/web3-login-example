@@ -1,15 +1,26 @@
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import NextAuth from 'next-auth';
+// import CredentialsProvider from 'next-auth/providers/credentials';
 import DiscordProvider from 'next-auth/providers/discord';
 import EmailProvider from 'next-auth/providers/email';
 import GoogleProvider from 'next-auth/providers/google';
 import TwitterProvider from 'next-auth/providers/twitter';
 
-import prisma from '~/prisma';
+import prisma, { PrismaAdapter } from '~/prisma';
+
+const adapter = PrismaAdapter(prisma);
 
 export default NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter,
   providers: [
+    // CredentialsProvider({
+    //   id: 'metamask',
+    //   name: 'Metamask',
+    //   credentials: {},
+    //   async authorize(credentials, req) {
+    //     const user = null;
+    //     return user;
+    //   },
+    // }),
     // Passwordless / email sign in
     EmailProvider({
       server: process.env.EMAIL_SERVER,
@@ -27,7 +38,6 @@ export default NextAuth({
     TwitterProvider({
       clientId: process.env.TWITTER_ID,
       clientSecret: process.env.TWITTER_SECRET,
-      version: '2.0',
     }),
   ],
   theme: {
@@ -36,6 +46,9 @@ export default NextAuth({
   callbacks: {
     async session({ session, user }) {
       return { ...session, user: { ...user, id: user.id } };
+    },
+    async jwt({ token, user }) {
+      return { ...token, user: user ? { id: user.id } : null };
     },
   },
 });

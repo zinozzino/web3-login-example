@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { FC } from 'react';
 
@@ -32,9 +32,9 @@ const Header: FC = () => {
               <Link href="/profile">
                 <a>{username}</a>
               </Link>
-              <Link href="/api/auth/signout">
-                <a>Log out</a>
-              </Link>
+              <button type="button" onClick={() => signOut()}>
+                Log out
+              </button>
             </>
           ) : (
             <Link href="/api/auth/signin">Log in</Link>

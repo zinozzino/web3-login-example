@@ -1,4 +1,4 @@
-import type { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import type { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
@@ -7,12 +7,15 @@ export interface PagePropsWithSession {
 }
 
 function getServerSideSession<Props>(
-  getServerSideProps?: GetServerSideProps<Props>
+  getServerSideProps?: (
+    // eslint-disable-next-line no-unused-vars
+    ctx: GetServerSidePropsContext & { session: Session | null }
+  ) => GetServerSidePropsResult<Props>
 ) {
   return async (ctx: GetServerSidePropsContext) => {
-    const result = await getServerSideProps?.(ctx);
-
     const session = await getSession(ctx);
+
+    const result = await getServerSideProps?.({ ...ctx, session });
 
     if (result == null) {
       return {
