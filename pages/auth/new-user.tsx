@@ -3,7 +3,6 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { signIn } from 'next-auth/react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { FC, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import * as yup from 'yup';
