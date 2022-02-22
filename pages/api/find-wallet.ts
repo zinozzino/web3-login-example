@@ -30,6 +30,7 @@ const Api: NextApiHandler = async (req, res) => {
 
   if (!wallet) {
     res.status(404).json({});
+    return;
   }
 
   res.status(200).json({ ...wallet });

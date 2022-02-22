@@ -8,6 +8,8 @@ const Header: FC = () => {
 
   const username = session?.user?.name ?? session?.user?.email ?? '';
 
+  const isLoggedIn = session && session.user.email;
+
   return (
     <header
       className={clsx([
@@ -27,7 +29,7 @@ const Header: FC = () => {
           <a className="text-2xl">Takehome</a>
         </Link>
         <div className="grid grid-flow-col gap-4">
-          {session ? (
+          {isLoggedIn ? (
             <>
               <Link href="/profile">
                 <a>{username}</a>

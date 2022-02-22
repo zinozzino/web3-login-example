@@ -3,6 +3,7 @@ import { getSession } from 'next-auth/react';
 import * as yup from 'yup';
 
 import prisma from '~/prisma';
+import getRandom from '~/utils/getRandom';
 
 const schema = yup.object().shape({
   address: yup.string().required(),
@@ -38,7 +39,7 @@ const Api: NextApiHandler = async (req, res) => {
           data: {
             address,
             userId,
-            nonce: Math.floor(Math.random() * 1000000),
+            nonce: getRandom(),
           },
           select: { address: true, id: true },
         });

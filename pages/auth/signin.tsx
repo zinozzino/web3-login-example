@@ -9,6 +9,7 @@ import Web3 from 'web3';
 
 import { IS_METAMASK_ENABLED } from '~/config';
 import getHash from '~/utils/getHash';
+import getRandom from '~/utils/getRandom';
 
 const EmailLogin: FC = () => {
   const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ const EmailLogin: FC = () => {
         type="email"
         value={email}
         onChange={event => setEmail(event.target.value)}
-        className={clsx('border-gray-200 border-[1px]', 'px-2 py-3 rounded-md')}
+        className={clsx('text-field')}
       />
       <button
         type="button"
@@ -62,7 +63,7 @@ const Page: FC<PageProps> = () => {
       nonce = response.nonce;
     } catch (err) {
       // TODO: generate temp session
-      return;
+      nonce = getRandom();
     }
 
     const data = getHash(nonce);
@@ -72,6 +73,7 @@ const Page: FC<PageProps> = () => {
     await signIn('metamask', {
       address,
       signedMessage,
+      nonce,
     });
   };
   const handleGoogle = () => signIn('google');
@@ -136,7 +138,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   if (session) {
     return {
       redirect: {
-        destination: '/',
+        destination: session.user.email ? '/' : '/auth/new-user',
       },
     };
   }

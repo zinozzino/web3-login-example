@@ -9,3 +9,10 @@
     @apply rounded-md;
   }
 }
+
+@layer components {
+  .text-field {
+    @apply border-gray-200 border-[1px];
+    @apply px-2 py-3 rounded-md;
+  }
+}
