@@ -37,7 +37,7 @@ const Header: FC = () => {
               </button>
             </>
           ) : (
-            <Link href="/api/auth/signin">Log in</Link>
+            <Link href="/auth/signin">Log in</Link>
           )}
         </div>
       </section>

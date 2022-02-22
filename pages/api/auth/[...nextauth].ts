@@ -1,26 +1,68 @@
+import * as sigUtil from 'eth-sig-util';
 import NextAuth from 'next-auth';
-// import CredentialsProvider from 'next-auth/providers/credentials';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import DiscordProvider from 'next-auth/providers/discord';
 import EmailProvider from 'next-auth/providers/email';
 import GoogleProvider from 'next-auth/providers/google';
 import TwitterProvider from 'next-auth/providers/twitter';
 
 import prisma, { PrismaAdapter } from '~/prisma';
+import getHash from '~/utils/getHash';
 
 const adapter = PrismaAdapter(prisma);
 
 export default NextAuth({
   adapter,
   providers: [
-    // CredentialsProvider({
-    //   id: 'metamask',
-    //   name: 'Metamask',
-    //   credentials: {},
-    //   async authorize(credentials, req) {
-    //     const user = null;
-    //     return user;
-    //   },
-    // }),
+    CredentialsProvider({
+      id: 'metamask',
+      name: 'Metamask',
+      credentials: {
+        address: {
+          type: 'string',
+          placeholder: '',
+        },
+        signedMessage: {
+          type: 'string',
+          placeholder: '',
+        },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
+        const { address, signedMessage } = credentials;
+
+        try {
+          const wallet = await prisma.wallet.findFirst({
+            select: { nonce: true, user: true },
+            where: { address },
+          });
+
+          if (!wallet) {
+            return null;
+          }
+
+          const data = getHash(wallet.nonce);
+
+          const recovered = sigUtil.recoverPersonalSignature({
+            data,
+            sig: signedMessage,
+          });
+
+          if (recovered !== address) {
+            return null;
+          }
+
+          return wallet.user;
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.log(err);
+          return null;
+        }
+      },
+    }),
     // Passwordless / email sign in
     EmailProvider({
       server: process.env.EMAIL_SERVER,
@@ -38,17 +80,20 @@ export default NextAuth({
     TwitterProvider({
       clientId: process.env.TWITTER_ID,
       clientSecret: process.env.TWITTER_SECRET,
+      version: '1.0a',
     }),
   ],
-  theme: {
-    colorScheme: 'light',
+  pages: {
+    signIn: '/auth/signin',
+  },
+  session: {
+    strategy: 'jwt',
   },
   callbacks: {
-    async session({ session, user }) {
-      return { ...session, user: { ...user, id: user.id } };
-    },
-    async jwt({ token, user }) {
-      return { ...token, user: user ? { id: user.id } : null };
+    async session(params) {
+      const { session, token } = params;
+
+      return { ...session, user: { ...session.user, id: `${token.sub}` } };
     },
   },
 });

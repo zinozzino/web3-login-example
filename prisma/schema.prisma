@@ -61,7 +61,7 @@ model Wallet {
   id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
   userId  String @db.ObjectId
   address String @unique
-  nonce   String
+  nonce   Int
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -18,7 +18,6 @@ import { IS_METAMASK_ENABLED } from '~/config';
 import useProtected from '~/hooks/useProtected';
 import prisma from '~/prisma';
 import getServerSideSession from '~/utils/getServerSideSession';
-import isNonNullArray from '~/utils/isNonNullArray';
 
 const queryKey = '/api/wallets';
 
@@ -41,17 +40,21 @@ const Page: FC<PageProps> = ({ accounts, providers }) => {
         throw new Error('metamask not installed');
       }
 
-      const addresses = await window.ethereum.request<string[]>({
-        method: 'eth_requestAccounts',
+      const address = await window.ethereum.request<string>({
+        method: 'eth_coinbase',
       });
 
-      if (isNonNullArray(addresses)) {
-        return (
-          await axios.post<{ wallets: Wallet[] }>(queryKey, { addresses })
-        ).data;
+      if (address) {
+        return [
+          (
+            await axios.post<Wallet>(queryKey, {
+              address,
+            })
+          ).data,
+        ];
       }
 
-      return { wallets: [] };
+      return [];
     },
     {
       onSuccess(newData) {
@@ -59,7 +62,7 @@ const Page: FC<PageProps> = ({ accounts, providers }) => {
 
         queryClient.setQueryData<Wallet[]>('/api/wallets', wallets => [
           ...(wallets ?? []),
-          ...newData.wallets,
+          ...newData,
         ]);
       },
       onError(error) {
@@ -99,7 +102,9 @@ const Page: FC<PageProps> = ({ accounts, providers }) => {
         <div className="p-4 grid grid-flow-row gap-4">
           {providers &&
             Object.entries(providers)
-              .filter(([provider]) => provider !== 'email')
+              .filter(
+                ([provider]) => ['metamask', 'email'].indexOf(provider) < 0
+              )
               .map(([provider]) => {
                 const account = accounts.find(acc => acc.provider === provider);
 
