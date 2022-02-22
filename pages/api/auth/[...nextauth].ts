@@ -1,4 +1,5 @@
 import * as sigUtil from 'eth-sig-util';
+import { pick } from 'lodash';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import DiscordProvider from 'next-auth/providers/discord';
@@ -35,7 +36,7 @@ const providers = [
 
       try {
         const wallet = await prisma.wallet.findFirst({
-          select: { nonce: true, user: true },
+          select: { nonce: true, user: true, id: true },
           where: { address },
         });
 
@@ -65,6 +66,11 @@ const providers = [
         if (recovered !== address) {
           return null;
         }
+
+        await prisma.wallet.update({
+          data: { nonce: getRandom() },
+          where: pick(wallet, ['id']),
+        });
 
         return wallet.user;
       } catch (err) {
